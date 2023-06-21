@@ -1,0 +1,55 @@
+import React, {useState, useEffect} from "react";
+import axios from "axios";
+
+export const useApi = ({method, 
+                        baseUrl,
+                        getAuthHeader,
+                        uri, dataTransform})=>{
+    const [data, setData] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const [api, setApi] = useState();
+    useEffect(()=>{
+        (async ()=>{
+            if(api){
+                const {body, params, headers} = api;
+                const authHeader = (getAuthHeader)?await getAuthHeader():{};
+                setError();
+                setData();
+                setLoading(true);
+                try{
+                    axios({
+                        method: method??='post',
+                        url: baseUrl  + '/' + uri,
+                        params: params,
+                        headers: {
+                            'content-type': 'application/json',
+                            ...authHeader,
+                            ...headers
+                        },
+                        data: body
+                    }).then(response=>{
+                        const data = response.data;                    
+                        if(dataTransform){
+                            setData(dataTransform(data));
+                        }
+                        else{
+                            setData(data);
+                        }
+                        setLoading(false);
+                    }).catch(err=>{
+                        setError(err.response?error.response.status:err.code);
+                        setLoading(false);
+                    })
+                }
+                catch(err){
+                    console.log('err')
+                    setError('SERVERDOWN');
+                    setLoading(false);
+                }
+            }
+        })()
+        
+    }, [api]);
+    return [setApi, {data, loading, error}];
+}

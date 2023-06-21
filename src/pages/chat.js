@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react"
 import { useHook } from "hooks/useHook";
+import { HookBoard } from "components/HookBoard/HookBoard";
 const IndexPage = () => {
   const [v, setV] = useState(0);
   const { callHook, hookSlot, hooks, loading, error } = useHook({})
@@ -7,9 +8,7 @@ const IndexPage = () => {
     console.log(hooks);
   }, [hooks]);
   return (
-    <div className="card">
-      <button onClick={()=>setV(v+1)}>{v}</button>
-    </div>
+    <HookBoard hooks={hooks} callHook={callHook}/>
   )
 }
 

@@ -1,10 +1,17 @@
 /**
  * @type {import('gatsby').GatsbyConfig}
  */
+console.log([process.env.NODE_ENV])
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
 module.exports = {
   siteMetadata: {
-    title: `ummo`,
-    siteUrl: `https://www.yourdomain.tld`,
+    title: `ummo.vn`,
+    siteUrl: `https://www.ummo.vn`,
   },
-  plugins: [],
+  plugins: [
+    "gatsby-plugin-postcss",
+    "gatsby-plugin-root-import"
+  ],
 }
