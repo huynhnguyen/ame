@@ -1,25 +1,19 @@
 import React from "react";
-import validator from '@rjsf/validator-ajv8';
-import Form from '@rjsf/core';
-const _schema = {
-    title: 'Todo',
-    type: 'object',
-    required: ['title'],
-    properties: {
-      title: { type: 'string', title: 'Title', default: 'A new task' },
-      done: { type: 'boolean', title: 'Done?', default: false },
-    },
-  };
-export const HookModal = ({schema, id, defaultData, loading, error})=>{
-    return <dialog className="modal" id={id}>
-        {schema && <Form
-            method="dialog"
-            className="modal-box"
-            schema={schema}
-            validator={validator}
-            onChange={(e)=>console.log('changed')}
-            onSubmit={(e)=>console.log('submitted')}
-            onError={(e)=>console.log('errors')}
-        />}
-    </dialog>
+import { HookForm } from "./HookForm";
+export const HookModal = ({id, hook, callHook})=>{
+  const submit = (data)=>{
+    callHook && callHook({data:data, name: hook.name});
+    window[id].close();
+  }
+  return <dialog className="modal" id={id}>
+    {hook && <div className="bg-white p-4 border rounded-md border-gray-500 ring-2 relative">
+      <svg xmlns="http://www.w3.org/2000/svg" 
+            fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
+            onClick={e=>window[id].close()}
+            className="w-8 h-8 absolute top-[-1rem] right-[-1rem] cursor-pointer hover:stroke-gray-600 fill-slate-200">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <HookForm {...hook} submit={submit} className="bg-white"/>
+    </div>}
+  </dialog>
 }

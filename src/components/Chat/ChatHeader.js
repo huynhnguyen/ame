@@ -1,5 +1,6 @@
 import React from "react";
-export const ChatHeader = ({botId, topic, channel})=>{
-    return <div>
+export const ChatHeader = ({user, topics, channel})=>{
+    return <div className="">
+        bar
     </div>
 }

@@ -17,6 +17,7 @@ export const useApi = ({method,
                 setError();
                 setData();
                 setLoading(true);
+                baseUrl = baseUrl??=process.env.GATSBY_API_URL;
                 try{
                     axios({
                         method: method??='post',
@@ -38,7 +39,7 @@ export const useApi = ({method,
                         }
                         setLoading(false);
                     }).catch(err=>{
-                        setError(err.response?error.response.status:err.code);
+                        setError(err.response?err.response.status:err.code);
                         setLoading(false);
                     })
                 }

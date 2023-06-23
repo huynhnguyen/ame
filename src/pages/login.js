@@ -1,13 +1,10 @@
 import React from "react";
 import Userfront from "@userfront/react";
-
-Userfront.init("7n8j878n");
-
-const LoginForm = Userfront.build({
-  toolId: "mlnabnd"
-});
-
+import { useAuth } from "hooks/useAuth";
+Userfront.init(process.env.GATSBY_USERFRONT_AUTH);
+const LoginForm = Userfront.build({toolId: process.env.GATSBY_USERFRONT_AUTH_LOGIN_ID});
 function App() {
+  const { user } = useAuth();
   return <LoginForm />;
 }
 

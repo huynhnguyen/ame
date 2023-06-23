@@ -1,32 +1,32 @@
 const ctx = self;
 importScripts("https://unpkg.com/xhr-shim@0.1.3/src/index.js");
 ctx.XMLHttpRequest = ctx.XMLHttpRequestShim;
-importScripts("https://unpkg.com/pyodide@0.23.3/pyodide.js");
+// importScripts("https://unpkg.com/pyodide@0.23.3/pyodide.js");
 
 const Ummo = {pyodide: null};
-loadPyodide({}).then((_pyodide) => {
-    Ummo.pyodide = _pyodide;
-    // let namespace = pyodide.globals.get("dict")();
+// loadPyodide({}).then((_pyodide) => {
+//     Ummo.pyodide = _pyodide;
+//     // let namespace = pyodide.globals.get("dict")();
   
-    // pyodide.runPython(
-    //   `
-    //   import json
+//     // pyodide.runPython(
+//     //   `
+//     //   import json
   
-    //   counter = 0
-    //   def modify_data(data):
-    //       global counter
-    //       counter += 1
-    //       dict = data.to_py()
-    //       dict['count'] = counter
-    //       return dict
-    //   `,
-    //   { globals: namespace },
-    // );
+//     //   counter = 0
+//     //   def modify_data(data):
+//     //       global counter
+//     //       counter += 1
+//     //       dict = data.to_py()
+//     //       dict['count'] = counter
+//     //       return dict
+//     //   `,
+//     //   { globals: namespace },
+//     // );
   
-    // // assign the modify_data function from the Python context to a Javascript variable
-    // modifyData = namespace.get("modify_data");
-    // namespace.destroy();
-});  
+//     // // assign the modify_data function from the Python context to a Javascript variable
+//     // modifyData = namespace.get("modify_data");
+//     // namespace.destroy();
+// });  
 Ummo.run = (code, function_name, kwargs)=>{
     if(!pyodide){
         console.log('pyodide not ready');

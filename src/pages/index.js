@@ -1,14 +1,11 @@
 import React, {useState, useEffect} from "react"
-import { useHook } from "hooks/useHook";
+import { useBotUser } from "hooks/useBotUser";
+import { Header } from "components/Header/Header";
 const IndexPage = () => {
-  const [v, setV] = useState(0);
-  const { callHook, hookSlot, hooks, loading, error } = useHook({})
-  useEffect(()=>{
-    console.log(hooks);
-  }, [hooks]);
+  const [setBotId, {user, loading, error}] = useBotUser({});
   return (
-    <div className="card">
-      <button onClick={()=>setV(v+1)}>{v}</button>
+    <div>
+      <Header user={user} loading={loading} error={error}/>
     </div>
   )
 }

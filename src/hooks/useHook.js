@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react"
-import { AnyType, Str } from "anytype";
+import { AnyType, Float, Str, Any } from "anytype";
 import { useAuth } from "./useAuth";
 import { useApi } from "./useApi";
 import { useUmmoWorker } from "./useUmmoWorker";
+export const HookSlot = AnyType({name: Str(), 
+                                start: Float(), 
+                                eslapse: Float(),
+                                slots: Array({items: Any(), default: []})})
+export const HookCaller = AnyType({name: Str(), data: Any()});
 export const useHook = ({})=>{
     const BaseURL = 'http://localhost:4000';
     const [getAccessToken, {user}] = useAuth();
@@ -18,28 +23,60 @@ export const useHook = ({})=>{
     }
     const [hookCaller, callHook] = useState();
     const [hooks, setHooks] = useState();
-    const [hookSlot, setHookSlot] = useState();
+    const [hookSlots, setHookSlot] = useState();
     const [loading, setHookLoading] = useState(true);
     const [requestList, listStatus] = useApi({
                                         method:'get',
                                         uri:'hooks/list',
                                         getAuthHeader: getAuthHeader, 
                                         baseUrl: BaseURL})
-    const [requestHook, hookStatus] = useApi({
+    const [requestHook, requestStatus] = useApi({
                                             method:'post',
                                             uri:'hooks',
                                             getAuthHeader: getAuthHeader, 
-                                            baseUrl: BaseURL})
+                                            baseUrl: BaseURL});
     useEffect(()=>{
-        console.log(listStatus)
         if(listStatus.data && !listStatus.loading && !listStatus.error){
             setHooks(listStatus.data);
+            setHookLoading(false);
         }
-    }, [listStatus]);
+    }, [listStatus.loading, listStatus.error]);
     useEffect(()=>{
         if(!listStatus.loading){
             requestList({});
+            setHookLoading(true);
         }
     }, []);
-    return {hooks, hookSlot, callHook, loading}
+    useEffect(()=>{
+        if(requestStatus.data && !requestStatus.loading && !requestStatus.error){
+            const nh = requestStatus.data;
+            setHookSlot(hs=>{
+                let found = false;
+                hs = hs??=[];
+                hs = hs.map(h=>{
+                    if(h.name===nh.name){
+                        found = true;
+                        return nh;
+                    }
+                    else{
+                        return h;
+                    }
+                })
+                if(!found){
+                    return [...hs, nh]
+                }
+                else{
+                    return hs
+                }
+            });
+            setHookLoading(false);
+        }
+    }, [requestStatus.data, requestStatus.error])
+    useEffect(()=>{
+        if(!requestStatus.loading && !loading && hookCaller){
+            requestHook({body:hookCaller});
+            setHookLoading(true);
+        }
+    }, [JSON.stringify(hookCaller)])
+    return {hooks, hookSlots, callHook, loading}
 }
