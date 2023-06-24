@@ -1,18 +1,21 @@
-import React, { useContext, useEffect } from "react";
-import { logout } from "@userfront/core";
+import React, { useEffect } from "react";
+import { logout } from "@userfront/react";
 import { navigate } from "@reach/router"
-import { useAuth } from "hooks/useAuth";
+import { useBotUser } from "hooks/useBotUser";
 
 function App() {
-    const { user } = useAuth();
+    const { user, loading } = useBotUser();
     useEffect(()=>{
+        if(loading){
+            return;
+        }
         if(!user){
             navigate('/');
         }
         else{
             logout();
         }
-    }, [user])
+    }, [user, loading])
     return <div>logout</div>;
 }
 

@@ -1,16 +1,30 @@
 import React, {useState, useEffect} from "react";
 import { ChatHeader } from "./ChatHeader";
-import { ChatList } from "./ChatList";
-import { ChatMessageList } from "./ChatMessageList";
+import { ChatMember } from "./ChatMember";
+import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { useChat } from "hooks/useChat";
 
 export const Chat = ({botId})=>{
-    const [sendMessage, {messages, stream, botTyping, loading, error, members, topics, user}] = useChat({botId});
-    return <div className="">
-        <ChatHeader user={user} topics={topics}/>
-        <ChatList members={null}/>
-        <ChatMessageList messages={messages} stream={stream}/>
-        <ChatInput sendMessage={sendMessage} botTyping={botTyping}/>
+    const [sendMessage, 
+            {   chatMessage, 
+                chatting, 
+                chatMember, 
+                loading, error, 
+                chatBot}, 
+            {   setMemberPage, 
+                setMessagePage, 
+                setChatTopic}] = useChat({botId});
+    return <div className={[loading?'':'', error?'':''].join(' ')}>
+        <ChatHeader chatBot={chatBot} 
+            setChatTopic={setChatTopic}/>
+        <ChatMember members={chatMember} 
+            setMemberPage={setMemberPage}/>
+        <ChatMessage 
+            chatMessage={chatMessage} 
+            setMessagePage={setMessagePage}/>
+        <ChatInput 
+            sendMessage={sendMessage} 
+            botTyping={chatting.typing}/>
     </div>
 }

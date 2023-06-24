@@ -9,7 +9,7 @@ export const HookSlot = AnyType({name: Str(),
                                 slots: Array({items: Any(), default: []})})
 export const HookCaller = AnyType({name: Str(), data: Any()});
 export const useHook = ({})=>{
-    const BaseURL = 'http://localhost:4000';
+    const BaseURL = process.env.GATSBY_API_URL;
     const [getAccessToken, {user}] = useAuth();
     const {worker, data} = useUmmoWorker({});
     const getAuthHeader = async ()=>{

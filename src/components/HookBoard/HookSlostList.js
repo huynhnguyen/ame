@@ -1,5 +1,5 @@
 import React from "react";
-import { LocaleSlot } from "components/HookSlot.js/LocaleSlot";
+import { LocaleSlot } from "components/HookSlot/LocaleSlot";
 
 export const HookSlotList = ({hookSlots, loading, callHook})=>{
     return <div className=" m-2">
