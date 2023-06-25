@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 export const ChatMessage = ({chatMessage, setMessagePage, chatMember})=>{
-    return chatMessage?<div className="h-full">
+    return chatMessage?<div className=" h-[calc(100vh-11rem)] bg-stone-300 p-1 overflow-x-auto x-scrollbar">
     {chatMessage.messageList?.map(({by, as, text, profile}, idx)=>
     <div key={idx} 
                 className={[as==='bot'?"chat chat-start":"chat chat-end"].join(' ')}>

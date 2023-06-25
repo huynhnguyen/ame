@@ -15,16 +15,20 @@ export const Chat = ({botId})=>{
             {   setMemberPage, 
                 setMessagePage, 
                 setChatTopic}] = useChat({botId});
-    return <div className={[loading?'':'', error?'':''].join(' ')}>
+    return <div className={[loading?'':'', error?'':'', ''].join(' ')}>
+        <div>
+            <ChatMember members={chatMember} 
+                setMemberPage={setMemberPage}/>
+        </div>
+        <div>
         <ChatHeader chatBot={chatBot} 
             setChatTopic={setChatTopic}/>
-        <ChatMember members={chatMember} 
-            setMemberPage={setMemberPage}/>
         <ChatMessage 
             chatMessage={chatMessage} 
             setMessagePage={setMessagePage}/>
         <ChatInput 
             sendMessage={sendMessage} 
             botTyping={chatting.typing}/>
+        </div>
     </div>
 }

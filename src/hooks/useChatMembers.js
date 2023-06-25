@@ -33,5 +33,23 @@ export const useChatMembers = ({botId})=>{
             requestMember({params:value})
         }
     }
-    return [getBotMembers, {members: chatMembers, loading: memberStatus.loading, error: memberStatus.error}]
+    const getMember = async ({user_id})=>{
+        let member = null
+        chatMembers.forEach((_member) => {
+            if(user_id===_member.user_id){
+                member = member;
+            }
+        });
+        if(!member){
+            return {};
+        }
+        else{
+            return member;
+        }
+    }   
+    return [getBotMembers, 
+            {members: chatMembers, 
+             loading: memberStatus.loading, 
+             error: memberStatus.error},
+            {getMember}]
 }

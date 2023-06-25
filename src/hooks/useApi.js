@@ -5,9 +5,9 @@ export const useApi = ({method,
                         baseUrl,
                         getAuthHeader,
                         uri, dataTransform})=>{
-    const [data, setData] = useState(false);
+    const [data, setData] = useState();
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState();
     const [api, setApi] = useState();
     useEffect(()=>{
         (async ()=>{

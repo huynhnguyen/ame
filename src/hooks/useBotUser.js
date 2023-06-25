@@ -8,13 +8,17 @@ const BotUser = AnyType({user_email: Str(),
                       user_name: [Str(), null],
                       user_phone: [Str(), null],
                       user_address: [Str(), null],
+                      friendly_name: [Str({default: ''}), null],
                       status: Str()});
 export const useBotUser = ()=>{
     const [user, setUser] = useState();
     const [botId, setBotId] = useState();
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(true);
-    const [getAccessToken, {loading: authLoading, accessToken}] = useAuth();
+    const [error, setError] = useState();
+    const [getAccessToken, 
+            {loading: authLoading, 
+             accessToken, 
+             error: authError}] = useAuth();
     const [requestUser, requestStatus] = useApi({method:'get', 
                                                 uri: 'users/me', 
                                                 getAuthHeader: ()=>{}});
@@ -32,14 +36,22 @@ export const useBotUser = ()=>{
         }
     }, [requestStatus.loading, requestStatus.error]);
     useEffect(()=>{
-        if(!authLoading && accessToken){
-            const headers = {'Authorization': "Bearer "+ accessToken}
-            if(botId){
-                headers['bot_id'] = botId;
+        console.log({accessToken, authLoading, authError});
+        if(!authLoading && !authError){
+            if(accessToken){
+                const headers = {'Authorization': "Bearer "+ accessToken}
+                if(botId){
+                    headers['bot_id'] = botId;
+                }
+                requestUser({headers:headers});
             }
-            requestUser({headers:headers});
+            else{
+                setError();
+                setUser(null);
+                setLoading(false);
+            }
         }
-    }, [accessToken, authLoading, error])
+    }, [accessToken, authLoading, authError])
     
     return [setBotId, {user, loading, error, botId}];
 }

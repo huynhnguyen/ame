@@ -8,20 +8,28 @@ export const ChatHeader = ({chatBot, setChatTopic})=>{
             }
         })
     }, [chatBot.chatTopic])
-    return chatBot?<div className="flex flex-row justify-between items-center bg-gray-400 border-gray-600">
-        <div className="dropdown">
-            <label tabIndex={tabIdx} className="btn btn-sm m-1">{chatBot.chatTopic}</label>
-            <ul tabIndex={tabIdx} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+    return chatBot?<div className="flex flex-row justify-between items-center border-gray-600">
+        <label className="m-2 text-black uppercase">{chatBot.fiendly_name}</label>
+        <div className="dropdown dropdown-end mr-2 ">
+            <div className=" inline-flex items-center">
+                <p className=" text-gray-500">chủ đề</p>
+                <label tabIndex={tabIdx} className="btn btn-sm m-1 rounded-none">
+                    {chatBot.chatTopic}
+                </label>
+            </div>
+            <ul tabIndex={tabIdx} className="dropdown-content menu p-2 shadow bg-base-100 w-40 rounded-none z-10">
                 {chatBot.topics?.map(({topic, description}, idx)=>
                     <li key={idx} 
-                        onClick={(e)=>setChatTopic(topic)} 
-                        className="tooltip tooltip-right" 
-                        data-tip={description}>
-                        <a>{topic}</a>
+                        onClick={(e)=>setChatTopic(topic)}>
+                        <div className="flex flex-col items-baseline">
+                            <h4 className=" text-xl capitalize">{topic}</h4>
+                            <p className="text-sm text-gray-600 capitalize">{description}</p>
+                        </div>
+                        
                     </li>
                 )}    
             </ul>
         </div>
-        <label className="m-2 text-white uppercase">{chatBot.channel}</label>
+        
     </div>:<div></div>
 }
