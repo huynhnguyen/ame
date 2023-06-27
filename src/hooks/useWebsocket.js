@@ -32,6 +32,21 @@ export const useWebsocket = ({authParams, baseUrl, uri})=>{
                 setConnected(false);
                 setLoading(false);
             };
+            ws.current.onmessage = e => {
+                setLoading(false);
+                if (isPaused) return;
+                const message = JSON.parse(e.data);
+                console.log(['onMessage', message.chunk_message])
+                if(message.chunk_message){
+                    setStreaming(true);
+                    setChunks(chs=>chs===undefined
+                        ?[message.chunk_message]:[...chs, message.chunk_message])
+                }
+                else{
+                    setStreaming(false);
+                    setData(message);
+                }
+            };
             wsCurrent = ws.current;
         }
         return () => {
@@ -40,25 +55,11 @@ export const useWebsocket = ({authParams, baseUrl, uri})=>{
             }            
         };
     }, [authParams]);
-    useEffect(() => {
-        if (!ws.current) return;
-        ws.current.onmessage = e => {
-            if (isPaused) return;
-            const message = JSON.parse(e.data);
-            if(message.chunk){
-                setStreaming(true);
-                setChunks(chs=>chs===undefined
-                    ?[message.chunk]:[...chs, message.chunk])
-            }
-            else{
-                setData(message);
-                setStreaming(false);
-            }
-        };
-    }, [isPaused]);
     const send = (message)=>{
-        if(ws.current){
+        if(connected && !streaming && !loading){
+            console.log('send', message)
             ws.current.send(JSON.stringify(message))
+            setLoading(true);
         }
     }
     return [send, {data, error, chunks, loading, streaming, connected}];

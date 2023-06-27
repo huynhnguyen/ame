@@ -5,9 +5,8 @@ export const ChatMember = ({chatMember})=>{
             user_avatar, 
             user_name, 
             user_email, 
-            user_phone, 
-            user_notice}, idx)=>{
-            <div className="avatar">
+            user_phone}, idx)=>{
+            <div className="avatar" key={idx}>
                 
             </div>
         })}

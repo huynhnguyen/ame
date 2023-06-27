@@ -5,39 +5,42 @@ import { useChatMembers } from "./useChatMembers";
 import { useChatBot } from "./useChatBot";
 import { useChatSocket } from "./useChatSocket";
 export const useChat = ({botId})=>{
-    const [setBotId, botUserStatus] = useBotUser({});
-    const [setMemberPage, memberStatus, {getMember}] = useChatMembers({botId});
-    const [sendChat, 
-            {typing, chunks, error, reply}] = useChatSocket({botId});
+    const { setBotId, 
+            getBearerHeader, 
+            accessToken, ...botUserStatus} = useBotUser({botId});
+    const [setMemberPage, 
+            memberStatus, {getMember}] = useChatMembers(
+                {botId, getAuthHeader: async ()=> await getBearerHeader()});
     const [setChannel, 
-            {topics, 
+            {   topics, 
                 channel, 
                 chatTopic, 
-                bot_avatar, 
-                fiendly_name, bot_notice}, 
-            {setChatTopic}] = useChatBot({botId});
+                botAvatar, 
+                botName}, 
+            {setChatTopic}] = useChatBot({botId, 
+                getAuthHeader: async ()=> await getBearerHeader()});
+    const [sendChat, 
+                {typing, chunks, error, reply, status}] = useChatSocket({botId, accessToken});
     const getProfile = async({by, as})=>{
         console.log({as, by})
         if(as==='bot'){
-            return {avatar: bot_avatar, name: fiendly_name}
+            return {avatar: botAvatar, name: botName}
         }
         if(as==='user'){
-            console.log(botUserStatus)
-            const {user_avatar, friendly_name} = botUserStatus.user;
-            return {avatar: user_avatar, name: fiendly_name}
+            const {user_avatar, user_name} = botUserStatus.user;
+            return {avatar: user_avatar, name: user_name}
         }
-        if(by){
+        if(as){
             const {user_avatar, user_name} = await getMember({user_id: by})
-            return {avatar: null, name: null}
+            return {avatar: user_avatar, name: user_name}
         }
-        return {avatar: null, name: null}
-        
+        return {avatar: null, name: null};
     }
     const [addMessage, 
-            {userMessage, messageList, messagePage}, 
-            {setMessagePage}] = useChatMessages({botId, sendChat, reply, getProfile });
+            {lastMessage, messageList, messagePage}, 
+            {setMessagePage}] = useChatMessages({botId, sendChat, reply, chunks, getProfile, channel });
     useEffect(()=>{
-        if(botId && botId !== botUserStatus.botId){
+        if(botId){
             setBotId(botId);
             setChannel('web');
         }
@@ -50,8 +53,8 @@ export const useChat = ({botId})=>{
     }
     return [sendMessage, 
             {   chatting:{typing, chunks, error}, 
-                chatMessage: {userMessage, messageList, messagePage},
-                chatBot: {topics, channel, chatTopic}, 
+                chatMessage: {lastMessage, messageList, messagePage},
+                chatBot: {topics, channel, chatTopic, botName, botAvatar, status}, 
                 loading: memberStatus.loading || botUserStatus.loading,
                 error: memberStatus.error || botUserStatus.error,
                 chatMembers: memberStatus.members, 

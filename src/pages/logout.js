@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-import { logout } from "@userfront/react";
 import { navigate } from "@reach/router"
 import { useBotUser } from "hooks/useBotUser";
 
 function App() {
-    const { user, loading } = useBotUser();
+    const { user, loading, logout } = useBotUser();
     useEffect(()=>{
         if(loading){
             return;

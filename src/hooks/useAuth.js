@@ -14,8 +14,16 @@ export const useAuth = ()=>{
         Userfront.init(process.env.GATSBY_USERFRONT_AUTH)
         
     }, [])
-    const getAccessToken = async ()=>{
-        if(Userfront?.tokens?.accessToken){
+    const getAccessToken = async () =>{
+        if(authed){
+            return await Userfront.accessToken();
+        }
+        else{
+            return null;
+        }
+    }
+    const getBearerHeader = async ()=>{
+        if(authed){
             const accessToken = await Userfront.accessToken();
             setAccessToken(accessToken);
             return {"Authorization": "Bearer "+ accessToken};
@@ -28,7 +36,7 @@ export const useAuth = ()=>{
         const authed = Userfront.user?.email;
         setAuthed(authed);
         if(authed){
-            if(params['uuid'] && params['type']=='login'){//reset query param after login
+            if(params['uuid'] && params['type']==='login'){//reset query param after login
                 setParams({'uuid': null, 'token': null, 'type': null});
             }
             setAccessToken(Userfront.tokens.accessToken);
@@ -41,5 +49,8 @@ export const useAuth = ()=>{
             setLoading(false);
         }
     }, [Userfront.user, JSON.stringify(params)]);
-    return [getAccessToken, {loading, error, accessToken, authed}];
+    const logout = ()=>{
+        Userfront.logout();
+    }
+    return {loading, error, accessToken, authed, getAccessToken, getBearerHeader, logout};
 }

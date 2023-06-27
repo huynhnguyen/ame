@@ -9,7 +9,14 @@ export const ChatHeader = ({chatBot, setChatTopic})=>{
         })
     }, [chatBot.chatTopic])
     return chatBot?<div className="flex flex-row justify-between items-center border-gray-600">
-        <label className="m-2 text-black uppercase">{chatBot.fiendly_name}</label>
+        <div className=" indicator mx-1">
+            <span className={[
+                    "indicator-item badge badge-xs",
+                    chatBot.status=='connected' && "badge-primary",
+                    chatBot.status=='streamming' && " badge-info",
+                    chatBot.status=='disconnected' && " badge-error"].join(' ')}></span> 
+            <label className="px-1 text-black uppercase">{chatBot.botName}</label>
+        </div>
         <div className="dropdown dropdown-end mr-2 ">
             <div className=" inline-flex items-center">
                 <p className=" text-gray-500">chủ đề</p>
@@ -30,6 +37,5 @@ export const ChatHeader = ({chatBot, setChatTopic})=>{
                 )}    
             </ul>
         </div>
-        
     </div>:<div></div>
 }

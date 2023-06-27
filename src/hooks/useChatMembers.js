@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "./useApi";
 import { AnyType, Str, Int, List, Any } from "anytype";
-import { useAuth } from "./useAuth"
 const ChatMember = AnyType({user_email: Str(), 
     user_id: Str(), 
     user_avatar: [Str(), null],
@@ -11,13 +10,12 @@ const ChatMember = AnyType({user_email: Str(),
     status: Str()});
 const MemberRequest = AnyType({page: Int(), page_size: Int()})
 const ChatMembers = AnyType({members: List({item: ChatMember}), page: Int(), page_size: Int()});
-export const useChatMembers = ({botId})=>{
-    const [chatMembers, setChatMembers] = useState();
-    const [getAccessToken] = useAuth();
+export const useChatMembers = ({botId, getAuthHeader})=>{
+    const [chatMembers, setChatMembers] = useState([]);
     const [requestMember, memberStatus] = useApi({
                                             method:'post', 
                                             uri:'bot/members', 
-                                            getAuthHeader: async ()=>{return await getAccessToken()}})
+                                            getAuthHeader})
     useEffect(()=>{
         if(!memberStatus.loading && !!memberStatus.error && memberStatus.data){
             console.log(memberStatus.data);
@@ -35,11 +33,13 @@ export const useChatMembers = ({botId})=>{
     }
     const getMember = async ({user_id})=>{
         let member = null
-        chatMembers.forEach((_member) => {
-            if(user_id===_member.user_id){
-                member = member;
-            }
-        });
+        if(chatMembers){
+            chatMembers?.forEach((_member) => {
+                if(user_id===_member.user_id){
+                    member = member;
+                }
+            });
+        }
         if(!member){
             return {};
         }

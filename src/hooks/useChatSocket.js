@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react"
 import { useWebsocket } from "./useWebsocket";
-import { useAuth } from "./useAuth";
-export const useChatSocket = ({botId})=>{
-    const [getAccessToken, {loading: authLoading, accessToken}] = useAuth();
+export const useChatSocket = ({botId, accessToken})=>{
     const [authParams, setAuthParams] = useState();
     useEffect(()=>{
-        if(!authLoading && accessToken){
+        console.log({botId, accessToken})
+        if(accessToken && botId){
             setAuthParams({'bearer': accessToken, 'bot_id': botId})
         }
-    }, [authLoading]);
-    const [send, {data, loading, error, chunks, streaming}] = useWebsocket({
+    }, [accessToken, botId]);
+    const [send, {data, loading, error, chunks, streaming, connected}] = useWebsocket({
         uri: 'chats/ws',
         authParams
     });
@@ -21,5 +20,6 @@ export const useChatSocket = ({botId})=>{
                 chunks:chunks, 
                 error:error, 
                 loading: loading,
+                status: connected?streaming?'streamming':'connected':'disconnected',
                 reply: data}];
 }

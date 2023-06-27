@@ -6,10 +6,10 @@ import { Loader } from "components/Loader/Loader";
 import { useParams } from "@reach/router";
 export const PrivateRoute = ({ component: Component, location, ...rest }) => {    
     const params = useParams();
-    const [setBot, {user, loading, botId}] = useBotUser({});
+    const {user, loading, botId, setBotId} = useBotUser({});
     useEffect(()=>{
         if(params.botId){
-            setBot(botId);
+            setBotId(params.botId);
         }
         else{
             throw Error('oop!')

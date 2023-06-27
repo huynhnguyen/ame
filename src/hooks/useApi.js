@@ -32,7 +32,13 @@ export const useApi = ({method,
                     }).then(response=>{
                         const data = response.data;                    
                         if(dataTransform){
-                            setData(dataTransform(data));
+                            const {value, error} = dataTransform(data);
+                            if(!error){
+                                setData(value);
+                            }
+                            else{
+                                setError(error);
+                            }
                         }
                         else{
                             setData(data);
