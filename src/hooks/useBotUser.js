@@ -34,6 +34,7 @@ export const useBotUser = ({botId: bid}={})=>{
     useEffect(()=>{
         if(!requestStatus.loading && !requestStatus.error && requestStatus.data){
             const {value, error} = BotUser(requestStatus.data);
+            
             if(!error){
                 value.user_name = value.user_name ??= value.user_email.split('@')[0]
                 setUser(value);

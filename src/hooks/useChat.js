@@ -8,8 +8,7 @@ export const useChat = ({botId})=>{
     const { setBotId, 
             getBearerHeader, 
             accessToken, ...botUserStatus} = useBotUser({botId});
-    const [setMemberPage, 
-            memberStatus, {getMember}] = useChatMembers(
+    const [getMember, memberStatus, {setMemberPage}] = useChatMembers(
                 {botId, getAuthHeader: async ()=> await getBearerHeader()});
     const [setChannel, 
             {   topics, 
@@ -20,7 +19,9 @@ export const useChat = ({botId})=>{
             {setChatTopic}] = useChatBot({botId, 
                 getAuthHeader: async ()=> await getBearerHeader()});
     const [sendChat, 
-                {typing, chunks, error, reply, status}] = useChatSocket({botId, accessToken});
+            {chunks, 
+             reply, 
+             status: botStatus}] = useChatSocket({botId, accessToken});
     const getProfile = async({by, as})=>{
         console.log({as, by})
         if(as==='bot'){
@@ -37,8 +38,8 @@ export const useChat = ({botId})=>{
         return {avatar: null, name: null};
     }
     const [addMessage, 
-            {lastMessage, messageList, messagePage}, 
-            {setMessagePage}] = useChatMessages({botId, sendChat, reply, chunks, getProfile, channel });
+            {botChunkMessage, messageList, messagePage}, 
+            {setMessagePage, setRoomChat}] = useChatMessages({botId, sendChat, reply, chunks, getProfile, channel });
     useEffect(()=>{
         if(botId){
             setBotId(botId);
@@ -52,12 +53,16 @@ export const useChat = ({botId})=>{
         }
     }
     return [sendMessage, 
-            {   chatting:{typing, chunks, error}, 
-                chatMessage: {lastMessage, messageList, messagePage},
-                chatBot: {topics, channel, chatTopic, botName, botAvatar, status}, 
+            {   chatMessage: {botChunkMessage, messageList, messagePage},
+                chatBot: {topics, channel, chatTopic, name:botName, avatar: botAvatar, 
+                    status: botStatus, 
+                    typing:['loading', 'streaming'].includes(botStatus)}, 
                 loading: memberStatus.loading || botUserStatus.loading,
                 error: memberStatus.error || botUserStatus.error,
-                chatMembers: memberStatus.members, 
-                user: botUserStatus.user}, 
-            {setMemberPage, setMessagePage, setChatTopic}]
+                chatMember: {members: memberStatus.members, memberPage: memberStatus.memberPage}, 
+                chatUser: botUserStatus.user}, 
+            {   setMemberPage, 
+                setMessagePage, 
+                setChatTopic, 
+                setRoomChat}]
 }

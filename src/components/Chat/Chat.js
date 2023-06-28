@@ -7,28 +7,29 @@ import { useChat } from "hooks/useChat";
 
 export const Chat = ({botId})=>{
     const [sendMessage, 
-            {   chatMessage, 
-                chatting, 
+            {   chatMessage,  
                 chatMember, 
                 loading, error, 
                 chatBot}, 
             {   setMemberPage, 
                 setMessagePage, 
                 setChatTopic}] = useChat({botId});
-    return <div className={[loading?'':'', error?'':'', ''].join(' ')}>
-        <div>
-            <ChatMember members={chatMember} 
+    return <div className={[loading?'':'', error?'':'', 'flex flex-row'].join(' ')}>
+        <div className="w-fit">
+            <ChatMember 
+                chatMember={chatMember} 
                 setMemberPage={setMemberPage}/>
         </div>
-        <div>
+        <div className="w-full">
         <ChatHeader chatBot={chatBot} 
             setChatTopic={setChatTopic}/>
         <ChatMessage 
-            chatMessage={chatMessage} 
+            chatMessage={chatMessage}
+            botStatus={chatBot.status}
             setMessagePage={setMessagePage}/>
         <ChatInput 
             sendMessage={sendMessage} 
-            botTyping={chatting.typing}/>
+            botTyping={chatBot.typing}/>
         </div>
     </div>
 }

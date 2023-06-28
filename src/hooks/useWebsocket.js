@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTimeout } from 'usehooks-ts';
 const ParamStr = (params)=>{
     let strBuilder = [];
     for (var key in params) {
@@ -55,10 +56,20 @@ export const useWebsocket = ({authParams, baseUrl, uri})=>{
             }            
         };
     }, [authParams]);
+    useEffect(()=>{
+        if(loading){
+            const id = setTimeout(() => {
+                setError('no response');
+                setLoading(false);
+            }, 3000)
+            return ()=>clearTimeout(id)
+        }
+    }, [loading])
     const send = (message)=>{
         if(connected && !streaming && !loading){
             console.log('send', message)
             ws.current.send(JSON.stringify(message))
+            setChunks([]);
             setLoading(true);
         }
     }

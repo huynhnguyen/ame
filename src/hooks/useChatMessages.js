@@ -24,39 +24,53 @@ const ChatMessage = AnyType({   text: Str(),
 export const useChatMessages = ({botId, sendChat, reply, chunks,
                                 pageSize, getProfile, channel})=>{
     const [message, setMessage] = useState();
-    const [lastMessage, setlastMessage] = useState();
-    const [messagePage, setMessagePage] = useLocalStorage(botId+'_page', 0);
-    const [messageList, setMessageList] = useLocalStorage(botId+'_messages_'+messagePage, []);
+    const [botChunkMessage, setChunkMessage] = useState();
+    const [messageList, setMessageList] = useState([]);
     const [chatMessage, setChatMessage] = useState();
+    const [roomChat, setRoom] = useState(botId);
+    const [pageIndex, setPageIndex] = useLocalStorage(roomChat+'_page', 0);
     useEffect(()=>{
         const {value, error} = ChatMessage(chatMessage);
         if(!error){
             pageSize = pageSize ??= 2;
             if(chatMessage){
                 const _messages = [...messageList, chatMessage];
-                setMessageList(_messages);         
+                setMessageList(_messages);       
                 if(_messages.length>pageSize){
-                    localStorage.setItem(botId+'_message_'+(messagePage+1), 
-                        JSON.stringify(messageList));
-                    setMessagePage(messagePage+1);
-                    setMessageList([chatMessage]);
+                    localStorage.setItem(botId + '_message_page_' + (pageIndex+1), 
+                        JSON.stringify(_messages.slice(-pageSize)));
+                    setPageIndex(pageIndex+1);
                 }
-                setlastMessage(chatMessage);   
             }
+        }        
+    }, [chatMessage]);
+    const setRoomChat = ({user_id, room_id})=>{
+        room_id = room_id??='direct_'+user_id;
+        if(room_id!==roomChat){
+            setRoom(room_id);
+            setMessageList([]);
+            set
         }
-        
-    }, [chatMessage])
+    }
+    useEffect(()=>{
+        if(chunks){
+            (async () => {
+                const profile = await getProfile({...chunks, as: 'bot'});
+                setChunkMessage({chunks: chunks, profile, as:'bot'})
+            })();
+        }
+    }, [chunks]);
     useEffect(()=>{
         if(reply){
-            setChatMessage({...reply, as:'bot'})
+            (async () => {
+                setChunkMessage(null);
+                const profile = await getProfile({...reply, as: 'bot'});
+                setChatMessage({...reply, profile, as: 'bot'})
+            })();
         }
-        if(chunks){
-            setlastMessage(m=>({...m, text: chunks.join(' '), as:'bot', to: m.by, by: m.to}))
-        }
-    }, [reply, chunks])
+    }, [reply])
     useEffect(()=>{
         if(message){
-            console.log('send', message)
             sendChat(message);    
             (async () => {
                 const profile = await getProfile(message);
@@ -65,7 +79,7 @@ export const useChatMessages = ({botId, sendChat, reply, chunks,
         }
     }, [message])
     const addMessage = (message)=>{        
-        const {value, error} = Message({...message, channel, as: 'user'});
+        const {value, error} = Message({...message, room: roomChat, channel, as: 'user'});
         if(!error){
             setMessage(value);
         }
@@ -74,5 +88,8 @@ export const useChatMessages = ({botId, sendChat, reply, chunks,
         }
                 
     }
-    return [addMessage, {messageList, lastMessage, messagePage}, {setMessagePage}]
+    const setMessagePage = (index)=>{
+        setPageIndex(index);
+    }
+    return [addMessage, {messageList, botChunkMessage, pageIndex}, {setMessagePage}]
 }

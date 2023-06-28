@@ -3,7 +3,6 @@ import { useWebsocket } from "./useWebsocket";
 export const useChatSocket = ({botId, accessToken})=>{
     const [authParams, setAuthParams] = useState();
     useEffect(()=>{
-        console.log({botId, accessToken})
         if(accessToken && botId){
             setAuthParams({'bearer': accessToken, 'bot_id': botId})
         }
@@ -20,6 +19,6 @@ export const useChatSocket = ({botId, accessToken})=>{
                 chunks:chunks, 
                 error:error, 
                 loading: loading,
-                status: connected?streaming?'streamming':'connected':'disconnected',
+                status: connected?loading?'loading':streaming?'streaming':'connected':'disconnected',
                 reply: data}];
 }

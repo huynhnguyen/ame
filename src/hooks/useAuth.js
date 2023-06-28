@@ -8,11 +8,12 @@ export const useAuth = ()=>{
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
     const [accessToken, setAccessToken] = useState();
-    const [params, setParams] = useSearchParams();
+    // const [params, setParams] = useSearchParams();
     
     useEffect(()=>{
-        Userfront.init(process.env.GATSBY_USERFRONT_AUTH)
-        
+        Userfront.init(process.env.GATSBY_USERFRONT_AUTH, ()=>{
+            console.log('init')
+        })
     }, [])
     const getAccessToken = async () =>{
         if(authed){
@@ -36,9 +37,9 @@ export const useAuth = ()=>{
         const authed = Userfront.user?.email;
         setAuthed(authed);
         if(authed){
-            if(params['uuid'] && params['type']==='login'){//reset query param after login
-                setParams({'uuid': null, 'token': null, 'type': null});
-            }
+            // if(params['uuid'] && params['type']==='login'){//reset query param after login
+            //     setParams({'uuid': null, 'token': null, 'type': null});
+            // }
             setAccessToken(Userfront.tokens.accessToken);
             setError(null);
             setLoading(false);
@@ -48,7 +49,7 @@ export const useAuth = ()=>{
             setError();
             setLoading(false);
         }
-    }, [Userfront.user, JSON.stringify(params)]);
+    }, [Userfront.user]);
     const logout = ()=>{
         Userfront.logout();
     }

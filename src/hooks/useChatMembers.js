@@ -7,30 +7,39 @@ const ChatMember = AnyType({user_email: Str(),
     user_name: [Str(), null],
     user_phone: [Str(), null],
     user_address: [Str(), null],
+    bot_role: Str(),
+    role_status: Str(),
     status: Str()});
 const MemberRequest = AnyType({page: Int(), page_size: Int()})
-const ChatMembers = AnyType({members: List({item: ChatMember}), page: Int(), page_size: Int()});
+const ChatMembers = AnyType({members: List({item: ChatMember}), page: Int()});
 export const useChatMembers = ({botId, getAuthHeader})=>{
     const [chatMembers, setChatMembers] = useState([]);
+    const [memberPage, setMemberPage] = useState();
     const [requestMember, memberStatus] = useApi({
-                                            method:'post', 
-                                            uri:'bot/members', 
-                                            getAuthHeader})
+                                            method:'get', 
+                                            uri:'chats/members', 
+                                            getAuthHeader});
+    const [memberId, setMemberId] = useState();
     useEffect(()=>{
-        if(!memberStatus.loading && !!memberStatus.error && memberStatus.data){
-            console.log(memberStatus.data);
+        console.log(memberStatus)
+        if(!memberStatus.loading && !memberStatus.error && memberStatus.data){
             const {value, error} = ChatMembers(memberStatus.data);
+            console.log({value, error});
             if(!error){
-                setChatMembers(value);
+                setChatMembers(value.members);
             }
         }
     }, [memberStatus.loading, memberStatus.error]);
-    const getBotMembers = (request)=>{
-        const {value, error} = MemberRequest(request)
-        if(!error){
-            requestMember({params:value})
+    useEffect(()=>{
+        if(botId){
+            if(!memberId){
+                requestMember({headers:{'Bot': botId}, params: {page: memberPage}});
+            }
+            else{
+                requestMember({headers:{'Bot': botId}, params: {page: memberPage, user_id: memberId}});
+            }
         }
-    }
+    }, [botId, memberId])
     const getMember = async ({user_id})=>{
         let member = null
         if(chatMembers){
@@ -46,10 +55,10 @@ export const useChatMembers = ({botId, getAuthHeader})=>{
         else{
             return member;
         }
-    }   
-    return [getBotMembers, 
-            {members: chatMembers, 
+    }
+    return [getMember, 
+            {members: chatMembers,
+             memberPage: memberPage, 
              loading: memberStatus.loading, 
-             error: memberStatus.error},
-            {getMember}]
+             error: memberStatus.error}, {setMemberPage}]
 }
